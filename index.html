@@ -14,11 +14,14 @@
 <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png">
 
 <style>
+:root {
+  --vh: 100%;
+}
 
 body{
   font-family: system-ui;
   margin:0;
-  min-height:100vh;
+  height: calc(var(--vh, 1vh) * 100);
   display:flex;
   justify-content:center;
   align-items:center;
@@ -29,7 +32,6 @@ body{
 }
 
 /* Hintergrundcontainer */
-
 .background-container{
   position:fixed;
   top:0;
@@ -39,8 +41,6 @@ body{
   z-index:0;
   overflow:hidden;
 }
-
-/* Hintergrundbilder */
 
 .background-container img{
   position:absolute;
@@ -56,26 +56,23 @@ body{
     transform 14s ease-out;
 }
 
-/* aktives Bild */
-
 .background-container img.active{
   opacity:1;
   transform:scale(1.02);
 }
 
 /* Karte */
-
 .card{
   position:relative;
   z-index:1;
-  background:rgba(255,255,255,0.8);
+  background:rgba(255,255,255,0.9);
   width:90%;
   max-width:420px;
   padding:40px;
 }
 
 .quote{
-  font-size:2.5rem;
+  font-size:2.5rem; /* geändert */
   margin-bottom:0.5rem;
 }
 
@@ -108,21 +105,31 @@ a:hover{
   transform:scale(1.05);
 }
 
+/* Karte auf Smartphones etwas kleiner */
+@media (max-width: 480px) {
+  .card {
+    width:85%;
+    padding:30px;
+  }
+}
 </style>
 
 <script>
-
-/* Rechtsklick deaktivieren */
-
+// Rechtsklick deaktivieren
 document.addEventListener("contextmenu", function(e){
   e.preventDefault();
 });
 
+// Dynamische Viewport-Höhe für mobile Safari
+function setVh() {
+  let vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+window.addEventListener('resize', setVh);
+window.addEventListener('load', setVh);
 
-/* Crossfade Slideshow + Ken Burns Zoom */
-
+/* Preloading & Slideshow */
 function startSlideshow(){
-
   const images = [
     {desktop:"images/bg1-large.jpg", mobile:"images/bg1-small.jpg"},
     {desktop:"images/bg2-large.jpg", mobile:"images/bg2-small.jpg"},
@@ -135,6 +142,7 @@ function startSlideshow(){
 
   const isMobile = window.innerWidth <= 768;
 
+  // Preload alle Bilder
   const elements = images.map(imgSet=>{
     const img=new Image();
     img.src = isMobile ? imgSet.mobile : imgSet.desktop;
@@ -142,24 +150,28 @@ function startSlideshow(){
     return img;
   });
 
-  let current=0;
-  elements[current].classList.add("active");
+  // warten bis alle geladen sind
+  let loadedCount = 0;
+  elements.forEach(img=>{
+    img.onload = ()=>{
+      loadedCount++;
+      if(loadedCount === elements.length){
+        // alle geladen, Slideshow starten
+        let current=0;
+        elements[current].classList.add("active");
 
-  setInterval(()=>{
-
-    const next=(current+1)%elements.length;
-
-    elements[current].classList.remove("active");
-    elements[next].classList.add("active");
-
-    current=next;
-
-  },10000);
-
+        setInterval(()=>{
+          const next=(current+1)%elements.length;
+          elements[current].classList.remove("active");
+          elements[next].classList.add("active");
+          current=next;
+        },10000);
+      }
+    };
+  });
 }
 
-window.onload=startSlideshow;
-
+window.addEventListener('load', startSlideshow);
 </script>
 
 </head>
