@@ -72,6 +72,142 @@ body{
 }
 
 .quote{
+  font-size:2.5rem; /* Desktopgröße */
+  margin-bottom:0.5rem;
+}
+
+.author{
+  font-size:1rem;
+  font-style:italic;
+  text-align:right;
+  margin-top:0;
+  margin-bottom:1.5rem;
+  color:#555;
+}
+
+.card p:not(.author){
+  color:#666;
+}
+
+a{
+  display:inline-block;
+  margin-top:20px;
+  text-decoration:none;
+  background:#000;
+  color:white;
+  padding:12px 20px;
+  border-radius:8px;
+  transition:transform 0.3s, background 0.3s;
+}
+
+a:hover{
+  background:#333;
+  transform:scale(1.05);
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 480px) {
+  .card {
+    width:80%;
+    padding:20px;
+  }
+
+  .quote {
+    font-size:1.8rem;
+  }
+
+  .author {
+    font-size:0.9rem;
+  }
+
+  .card p:not(.author) {
+    font-size:0.85rem;
+  }
+
+  a {
+    padding:10px 16px;
+    font-size:0.9rem;
+  }
+}
+</style>
+
+<script>
+// Rechtsklick deaktivieren
+document.addEventListener("contextmenu", function(e){
+  e.preventDefault();
+});
+
+// Dynamische Viewport-Höhe für mobile Safari
+function setVh() {
+  let vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+window.addEventListener('resize', setVh);
+window.addEventListener('load', setVh);
+
+/* Preloading & Slideshow */
+function startSlideshow(){
+  const images = [
+    {desktop:"images/bg1-large.jpg", mobile:"images/bg1-small.jpg"},
+    {desktop:"images/bg2-large.jpg", mobile:"images/bg2-small.jpg"},
+    {desktop:"images/bg3-large.jpg", mobile:"images/bg3-small.jpg"}
+  ];
+
+  const container=document.createElement("div");
+  container.className="background-container";
+  document.body.prepend(container);
+
+  const isMobile = window.innerWidth <= 768;
+
+  // Preload alle Bilder
+  const elements = images.map(imgSet=>{
+    const img=new Image();
+    img.src = isMobile ? imgSet.mobile : imgSet.desktop;
+    container.appendChild(img);
+    return img;
+  });
+
+  // warten bis alle geladen sind
+  let loadedCount = 0;
+  elements.forEach(img=>{
+    img.onload = ()=>{
+      loadedCount++;
+      if(loadedCount === elements.length){
+        // alle geladen, Slideshow starten
+        let current=0;
+        elements[current].classList.add("active");
+
+        setInterval(()=>{
+          const next=(current+1)%elements.length;
+          elements[current].classList.remove("active");
+          elements[next].classList.add("active");
+          current=next;
+        },10000);
+      }
+    };
+  });
+}
+
+window.addEventListener('load', startSlideshow);
+</script>
+
+</head>
+
+<body>
+
+<div class="card">
+<h1 class="quote">»Die schönsten Nachrichten kommen per Post.«</h1>
+<p class="author">-Mark&nbsp;Twain-</p>
+<p>Ich heiße Armando und finde Mark Twain hat recht.</p>
+<a href="mailto:mail@armando-mende.com">Briefkasten</a>
+</div>
+
+</body>
+</html>  max-width:420px;
+  padding:40px;
+}
+
+.quote{
   font-size:2.5rem; /* geändert */
   margin-bottom:0.5rem;
 }
